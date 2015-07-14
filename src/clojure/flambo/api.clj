@@ -124,9 +124,17 @@
 ;;
 (defn text-file
   "Reads a text file from HDFS, a local file system (available on all nodes),
-  or any Hadoop-supported file system URI, and returns it as an `JavaRDD` of Strings."
+  or any Hadoop-supported file system URI, and returns it as an
+  `JavaRDD` of Strings."
   [spark-context filename]
   (.textFile spark-context filename))
+
+(defn whole-text-files
+  "Read a directory of text files from HDFS, a local file
+  system (available on all nodes), or any Hadoop-supported file system
+  URI."
+  [spark-context path min-partitions]
+  (.wholeTextFiles spark-context path min-partitions))
 
 (defn parallelize
   "Distributes a local collection to form/return an RDD"
