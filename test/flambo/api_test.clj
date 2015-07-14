@@ -30,7 +30,16 @@
             rdd2 (f/parallelize c [21 22 23])]
         (-> (f/union rdd1 rdd2)
             f/collect
-            vec) => (just [1 2 3 4 21 22 23] :in-any-order))))))
+            vec) => (just [1 2 3 4 21 22 23] :in-any-order)))
+
+     (fact
+      "union concats multiple RDDs"
+      (let [rdd1 (f/parallelize c [1 2 3 4])
+            rdd2 (f/parallelize c [21 22 23])
+            rdd3 (f/parallelize c [31 32 33])]
+        (-> (f/union c rdd1 rdd2 rdd3)
+            f/collect
+            vec) => (just [1 2 3 4 21 22 23 31 32 33] :in-any-order))))))
 
 (facts
  "about serializable functions"
@@ -326,6 +335,26 @@
           f/count) => 5)
 
      (fact
+      "min return the min value in an RDD"
+      (-> (f/parallelize c [9 6 1 2 8 5 4 3])
+          f/min) => 1)
+
+     (fact
+      "min return the min value in an RDD with comparator"
+      (-> (f/parallelize c [9 6 1 2 8 5 4 3])
+          (f/min compare)) => 1)
+
+     (fact
+      "min return the min value in an RDD"
+      (-> (f/parallelize c [9 6 1 2 8 5 4 3])
+          f/max) => 9)
+
+     (fact
+      "min return the min value in an RDD with comparator"
+      (-> (f/parallelize c [9 6 1 2 8 5 4 3])
+          (f/max compare)) => 9)
+
+     (fact
       "collect returns all elements of the RDD as an array at the driver program"
       (-> (f/parallelize c [[1] [2] [3] [4] [5]])
           f/collect
@@ -350,6 +379,11 @@
       (-> (f/parallelize c [1 2 3 4 5])
           (f/take 3)) => [1 2 3])
 
+     (fact
+      "take returns an array with the first n elements of an RDD"
+      (-> (f/parallelize c [9 3 8 1 2 4])
+          (f/take-ordered 3 compare)) => [1 2 3])
+               
      (fact
       "glom returns an RDD created by coalescing all elements within each partition into a list"
       (-> (f/parallelize c [1 2 3 4 5 6 7 8 9 10] 2)
